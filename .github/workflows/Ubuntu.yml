@@ -6,25 +6,18 @@ jobs:
   secure-ssh:
     runs-on: ubuntu-latest
     timeout-minutes: 3600
-
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      DEBIAN_PRIORITY: critical
+      TZ: Asia/Shanghai
+      
     steps:
       - name: 配置用户
         run: |
           sudo -i <<EOF
           echo "root:@Awf123456789" | chpasswd
           EOF
-          
-      - name: 配置环境变量
-        run: |
-          sudo -i <<EOF
-          cat >> /etc/environment <<'EOF'
-          DEBIAN_FRONTEND=noninteractive
-          DEBIAN_PRIORITY=critical
-          TZ=Asia/Shanghai
-          EOF
-          source /etc/environment
-          EOF
-          
+            
       - name: 更改系统语言(中文)
         run: |
           sudo -i <<EOF
