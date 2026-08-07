@@ -1,0 +1,91 @@
+name: Windows
+on:
+  workflow_dispatch
+
+jobs:
+  secure_rdp_deploy:
+    runs-on: windows-latest
+    timeout-minutes: 3600
+
+    steps:
+      - name: 配置RDP基础参数
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' `
+                             -Name "fDenyTSConnections" -Value 0 -Force
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
+                             -Name "UserAuthentication" -Value 0 -Force
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
+                             -Name "SecurityLayer" -Value 0 -Force
+
+          netsh advfirewall firewall delete rule name="RDP-Tailscale"
+          netsh advfirewall firewall add rule name="RDP-Tailscale" `
+            dir=in action=allow protocol=TCP localport=3389
+
+          Restart-Service -Name TermService -Force
+
+      - name: 创建windows登录账户
+        run: |
+          $RDP_USER = "Administrator"
+          $RDP_PASS = "@Awf123456789"
+          $securePass = ConvertTo-SecureString $RDP_PASS -AsPlainText -Force
+
+          New-LocalUser -Name $RDP_USER `
+            -Password $securePass `
+            -FullName $RDP_USER `
+            -Description "Remote Desktop Administrator Account"
+
+          Add-LocalGroupMember -Group "Administrators" -Member $RDP_USER
+          Add-LocalGroupMember -Group "Remote Desktop Users" -Member $RDP_USER
+
+          echo "RDP_USER=$RDP_USER" >> $env:GITHUB_ENV
+          echo "RDP_PASSWORD=$RDP_PASS" >> $env:GITHUB_ENV
+
+      - name: 安装Tailscale
+        run: |
+          $tsUrl = "https://pkgs.tailscale.com/stable/tailscale-setup-latest-amd64.msi"
+          $installerPath = "$env:TEMP\tailscale.msi"
+          
+          Invoke-WebRequest -Uri $tsUrl -OutFile $installerPath
+          Start-Process msiexec.exe -ArgumentList "/i", "`"$installerPath`"", "/quiet", "/norestart" -Wait
+          Remove-Item $installerPath -Force
+
+      - name: 连接Tailscale组网
+        env:
+          KEY: ${{ secrets.KEY }}
+        run: |
+          & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:KEY --hostname=gh-run-$env:GITHUB_RUN_ID
+          
+          $tsIP = $null
+          $retries = 0
+          while (-not $tsIP -and $retries -lt 10) {
+              $tsIP = & "$env:ProgramFiles\Tailscale\tailscale.exe" ip -4
+              Start-Sleep -Seconds 5
+              $retries++
+          }
+          
+          if (-not $tsIP) {
+              Write-Error "Tailscale IP not assigned. Exiting."
+              exit 1
+          }
+          echo "TAILSCALE_IP=$tsIP" >> $env:GITHUB_ENV
+
+      - name: 检测RDP端口连通性
+        run: |
+          $testResult = Test-NetConnection -ComputerName $env:TAILSCALE_IP -Port 3389
+          if (-not $testResult.TcpTestSucceeded) {
+              Write-Error "TCP connection to RDP port 3389 failed"
+              exit 1
+          }
+
+      - name: 输出连接信息并保持运行
+        run: |
+          Write-Host "`n=== windows登录信息 ==="
+          Write-Host "地址：$env:TAILSCALE_IP"
+          Write-Host "用户名：$env:RDP_USER"
+          Write-Host "密码：$env:RDP_PASSWORD"
+          Write-Host "=====================`n"
+          
+          while ($true) {
+              Write-Host "[$(Get-Date)] windows服务器运行中"
+              Start-Sleep -Seconds 300
+          }
