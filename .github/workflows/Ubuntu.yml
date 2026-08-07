@@ -11,13 +11,7 @@ jobs:
       - name: 配置用户
         run: |
           sudo -i <<EOF
-          if ! id -u ubuntu >/dev/null 2>&1; then
-            useradd -m -s /bin/bash ubuntu
-            usermod -aG sudo ubuntu
-          fi
-          echo "ubuntu:@Awf123456789" | chpasswd
-          echo "ubuntu ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ubuntu-ssh
-          chmod 0440 /etc/sudoers.d/ubuntu-ssh
+          echo "root:@Awf123456789" | chpasswd
           EOF
 
       - name: 配置SSH服务
