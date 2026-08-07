@@ -4,11 +4,15 @@ on: workflow_dispatch
 jobs:
   macos-gui:
     runs-on: macos-latest
-    timeout-minutes: 360
+    timeout-minutes: 3600
     steps:
       - name: 安装Tailscale
         run: |
           brew install tailscale
+      - name: 启动 Tailscale 后台守护进程
+        run: |
+          sudo brew services start tailscale
+          sleep 5
       - name: Tailscale 入网
         env:
           KEY: ${{ secrets.KEY }}
@@ -23,5 +27,5 @@ jobs:
       - name: 显示IP
         run: |
           tailscale ip
-      - name: 保持运行，挂起到超时销毁
+      - name: 保持运行
         run: sleep 360m
