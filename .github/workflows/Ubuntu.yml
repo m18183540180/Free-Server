@@ -20,15 +20,28 @@ jobs:
           chmod 0440 /etc/sudoers.d/ubuntu-ssh
           EOF
 
-      - name: 配置SSH服务
+            - name: 配置SSH服务
         run: |
           sudo -i <<EOF
           sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
           sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+          
+          # 新增：关闭 ChallengeResponseAuthentication，规避 keyboard‑interactive 交互认证报错
+          sed -i 's/^#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+          sed -i 's/^ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+
+          # 关键：覆盖 cloud‑init 的附加配置，防止被重置参数
+          cat > /etc/ssh/sshd_config.d/50-cloud-init.conf <<'CONF'
+PasswordAuthentication yes
+ChallengeResponseAuthentication no
+PermitRootLogin prohibit-password
+UsePAM yes
+CONF
+
           systemctl restart ssh
           ufw allow from any to any  # 允许所有端口所有协议
           ufw reload
-          grep -E "PasswordAuthentication|PermitRootLogin" /etc/ssh/sshd_config
+          grep -E "PasswordAuthentication|PermitRootLogin|ChallengeResponseAuthentication" /etc/ssh/sshd_config
           systemctl status ssh --no-pager
           ufw status  # 验证所有端口协议放行状态
           EOF
