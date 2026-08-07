@@ -13,7 +13,25 @@ jobs:
           sudo -i <<EOF
           echo "root:@Awf123456789" | chpasswd
           EOF
-
+          
+      - name: 配置环境变量
+        run: |
+          cat >> /etc/environment <<'EOF'
+          DEBIAN_FRONTEND=noninteractive
+          DEBIAN_PRIORITY=critical
+          TZ=Asia/Shanghai
+          EOF
+          source /etc/environment
+          EOF
+          
+      - name: 更改系统语言(中文)
+        run: |
+          apt update -y
+          apt install -y locales language-pack-zh-hans language-pack-zh-hans-base
+          locale-gen zh_CN.UTF-8
+          update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
+          EOF
+          
       - name: 配置SSH服务
         run: |
           sudo -i <<EOF
@@ -56,7 +74,7 @@ jobs:
             exit 1
           fi
           echo "TAILSCALE_IP=$TAILSCALE_IP" >> $GITHUB_ENV
-          echo "SSH_USER=ubuntu" >> $GITHUB_ENV
+          echo "SSH_USER=root" >> $GITHUB_ENV
           echo "SSH_PASSWORD=@Awf123456789" >> $GITHUB_ENV
 
       - name: 检测SSH端口连通性
