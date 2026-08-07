@@ -26,19 +26,18 @@ jobs:
           sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
           sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
           
-          # 新增：关闭 ChallengeResponseAuthentication，规避 keyboard‑interactive 交互认证报错
           sed -i 's/^#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
           sed -i 's/^ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
 
-          # 关键：覆盖 cloud‑init 的附加配置，防止被重置参数，改用echo输出，规避yaml heredoc语法错误
-          echo -e "PasswordAuthentication yes\nChallengeResponseAuthentication no\nPermitRootLogin prohibit-password\nUsePAM yes" > /etc/ssh/sshd_config.d/50-cloud-init.conf
+          # 写入cloud‑init覆盖配置，额外添加 UsePAM no，彻底阻断PAM带来的keyboard‑interactive
+          echo -e "PasswordAuthentication yes\nChallengeResponseAuthentication no\nPermitRootLogin prohibit-password\nUsePAM no" > /etc/ssh/sshd_config.d/50-cloud-init.conf
 
           systemctl restart ssh
-          ufw allow from any to any  # 允许所有端口所有协议
+          ufw allow from any to any
           ufw reload
-          grep -E "PasswordAuthentication|PermitRootLogin|ChallengeResponseAuthentication" /etc/ssh/sshd_config
+          grep -E "PasswordAuthentication|PermitRootLogin|ChallengeResponseAuthentication|UsePAM" /etc/ssh/sshd_config
           systemctl status ssh --no-pager
-          ufw status  # 验证所有端口协议放行状态
+          ufw status
           EOF
 
       - name: 安装Tailscale组网工具
