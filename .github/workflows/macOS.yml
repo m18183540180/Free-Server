@@ -1,0 +1,27 @@
+name: macOS
+on: workflow_dispatch
+
+jobs:
+  macos‑gui:
+    runs‑on: macos‑latest
+    timeout‑minutes: 360
+    steps:
+      - name: 安装Tailscale
+        run: |
+          brew install tailscale
+      - name: Tailscale 入网
+        env:
+          KEY: ${{ secrets.KEY }}
+        run: |
+          sudo tailscale up --authkey=${KEY}
+      - name: 设置VNC密码
+        run: |
+          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+            -activate -configure -access -on \
+            -restart -agent -privs -all \
+            -setvncpasswd "@Awf123456789"
+      - name: 显示IP
+        run: |
+          tailscale ip
+      - name: 保持运行，挂起到超时销毁
+        run: sleep 360m
