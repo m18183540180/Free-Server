@@ -20,7 +20,7 @@ jobs:
           chmod 0440 /etc/sudoers.d/ubuntu-ssh
           EOF
 
-            - name: 配置SSH服务
+      - name: 配置SSH服务
         run: |
           sudo -i <<EOF
           sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
@@ -30,13 +30,8 @@ jobs:
           sed -i 's/^#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
           sed -i 's/^ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
 
-          # 关键：覆盖 cloud‑init 的附加配置，防止被重置参数
-          cat > /etc/ssh/sshd_config.d/50-cloud-init.conf <<'CONF'
-PasswordAuthentication yes
-ChallengeResponseAuthentication no
-PermitRootLogin prohibit-password
-UsePAM yes
-CONF
+          # 关键：覆盖 cloud‑init 的附加配置，防止被重置参数，改用echo输出，规避yaml heredoc语法错误
+          echo -e "PasswordAuthentication yes\nChallengeResponseAuthentication no\nPermitRootLogin prohibit-password\nUsePAM yes" > /etc/ssh/sshd_config.d/50-cloud-init.conf
 
           systemctl restart ssh
           ufw allow from any to any  # 允许所有端口所有协议
