@@ -2,9 +2,9 @@ name: macOS
 on: workflow_dispatch
 
 jobs:
-  macos‑gui:
-    runs‑on: macos‑latest
-    timeout‑minutes: 360
+  macos-gui:
+    runs-on: macos-latest
+    timeout-minutes: 360
     steps:
       - name: 安装Tailscale
         run: |
