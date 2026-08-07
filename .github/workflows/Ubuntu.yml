@@ -16,6 +16,7 @@ jobs:
           
       - name: 配置环境变量
         run: |
+          sudo -i <<EOF
           cat >> /etc/environment <<'EOF'
           DEBIAN_FRONTEND=noninteractive
           DEBIAN_PRIORITY=critical
@@ -26,6 +27,7 @@ jobs:
           
       - name: 更改系统语言(中文)
         run: |
+          sudo -i <<EOF
           apt update -y
           apt install -y locales language-pack-zh-hans language-pack-zh-hans-base
           locale-gen zh_CN.UTF-8
