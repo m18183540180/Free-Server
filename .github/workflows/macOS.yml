@@ -6,9 +6,9 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 360
     steps:
-      - name: 安装Tailscale
+      - name: 安装Tailscale + TigerVNC
         run: |
-          brew install tailscale
+          brew install tailscale tigervnc
       - name: 启动 Tailscale 后台守护进程
         run: |
           sudo brew services start tailscale
