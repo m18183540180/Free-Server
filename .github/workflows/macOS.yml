@@ -7,25 +7,28 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: 安装Tailscale + TigerVNC
-        run: |
-          brew install tailscale tigervnc
+        run: brew install tailscale tigervnc
+
       - name: 启动 Tailscale 后台守护进程
         run: |
           sudo brew services start tailscale
           sleep 8
+
       - name: Tailscale 入网
         env:
           KEY: ${{ secrets.KEY }}
         run: |
           sudo tailscale up --authkey=${KEY}
+
       - name: 启动独立VNC服务
         run: |
           mkdir -p ~/.vnc
           echo "@Awf123456789" | vncpasswd -f > ~/.vnc/passwd
           chmod 600 ~/.vnc/passwd
           vncserver :0 -geometry 1920x1080
+
       - name: IP
-        run: |
-          tailscale ip
+        run: tailscale ip
+
       - name: 保持运行
         run: sleep 360m
