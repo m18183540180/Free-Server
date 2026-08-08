@@ -4,7 +4,7 @@ on: workflow_dispatch
 jobs:
   macos-gui:
     runs-on: macos-latest
-    timeout-minutes: 3600
+    timeout-minutes: 360
     steps:
       - name: 安装Tailscale
         run: |
@@ -12,19 +12,19 @@ jobs:
       - name: 启动 Tailscale 后台守护进程
         run: |
           sudo brew services start tailscale
-          sleep 5
+          sleep 8
       - name: Tailscale 入网
         env:
           KEY: ${{ secrets.KEY }}
         run: |
           sudo tailscale up --authkey=${KEY}
-      - name: 设置VNC密码
+      - name: 启动独立VNC服务
         run: |
-          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
-            -activate -configure -access -on \
-            -restart -agent -privs -all \
-            -setvncpasswd "@Awf123456789"
-      - name: 显示IP
+          mkdir -p ~/.vnc
+          echo "@Awf123456789" | vncpasswd -f > ~/.vnc/passwd
+          chmod 600 ~/.vnc/passwd
+          vncserver :0 -geometry 1920x1080
+      - name: IP
         run: |
           tailscale ip
       - name: 保持运行
