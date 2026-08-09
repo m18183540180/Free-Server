@@ -30,15 +30,6 @@ jobs:
       - name: 配置SSH服务
         run: |
           sudo -i <<EOF
-          sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-          sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-          
-          sed -i 's/^#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
-          sed -i 's/^ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
-
-          # 写入cloud‑init覆盖配置，额外添加 UsePAM no，彻底阻断PAM带来的keyboard‑interactive
-          echo -e "PasswordAuthentication yes\nChallengeResponseAuthentication no\nPermitRootLogin prohibit-password\nUsePAM no" > /etc/ssh/sshd_config.d/50-cloud-init.conf
-
           systemctl restart ssh
           ufw allow from any to any
           ufw reload
