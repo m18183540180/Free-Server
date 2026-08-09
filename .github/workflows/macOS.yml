@@ -4,7 +4,7 @@ on: workflow_dispatch
 jobs:
   macos-gui:
     runs-on: macos-latest
-    timeout-minutes: 360
+    timeout-minutes: 3600
     steps:
       - name: 安装Tailscale + TigerVNC
         run: brew install tailscale tigervnc
@@ -20,15 +20,8 @@ jobs:
         run: |
           sudo tailscale up --authkey=${KEY}
 
-      - name: 启动独立VNC服务
-        run: |
-          mkdir -p ~/.vnc
-          echo "@Awf123456789" | /opt/homebrew/bin/vncpasswd -f > ~/.vnc/passwd
-          chmod 600 ~/.vnc/passwd
-          /opt/homebrew/bin/vncserver :0 -geometry 1920x1080
-
       - name: IP
         run: tailscale ip
 
       - name: 保持运行
-        run: sleep 360m
+        run: sleep 360
