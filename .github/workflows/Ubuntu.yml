@@ -53,10 +53,10 @@ jobs:
 
       - name: 配置VS Code网页版
         run: |
-          echo "runner ALL=(ALL) NOPASSWD: /bin/systemctl" | sudo tee /etc/sudoers.d/code-server-runner
-          sudo chmod 0440 /etc/sudoers.d/code-server-runner
-          sudo systemctl stop code-server@* 2>/dev/null || true
-          sudo systemctl disable code-server@* 2>/dev/null || true
+          sudo -i <<'ROOT'
+          systemctl stop code-server@* 2>/dev/null || true
+          systemctl disable code-server@* 2>/dev/null || true
+          ROOT
           code-server --bind-addr 127.0.0.1:8080 &
           sleep 10
           pkill -f code-server
@@ -64,8 +64,9 @@ jobs:
           s/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/
           s/auth: password/auth: none/
           ' ~/.config/code-server/config.yaml
+          sudo -i <<'ROOT'
           systemctl enable --now code-server@runner
-          EOF
+          ROOT
 
 
       - name: 展示信息
