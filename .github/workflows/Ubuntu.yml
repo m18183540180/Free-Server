@@ -54,6 +54,10 @@ jobs:
       - name: 配置VS Code网页版
         run: |
           sudo -i <<'EOF'
+          sed -i '
+          s/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/
+          s/auth: password/auth: none/
+          ' /root/.config/code-server/config.yaml
           pkill -f code-server || true
           systemctl stop code-server@* 2>/dev/null
           systemctl disable code-server@* 2>/dev/null
