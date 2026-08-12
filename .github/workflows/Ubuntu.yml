@@ -27,20 +27,19 @@ jobs:
           update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
           EOF
           
-      - name: 配置SSH服务
+      - name: 配置防火墙
         run: |
           sudo -i <<EOF
-          systemctl restart ssh
           ufw allow from any to any
           ufw reload
-          grep -E "PasswordAuthentication|PermitRootLogin|ChallengeResponseAuthentication|UsePAM" /etc/ssh/sshd_config
-          systemctl status ssh --no-pager
           ufw status
           EOF
 
-      - name: 安装Tailscale组网工具
+      - name: 安装Tailscale和VS Code网页版
         run: |
-          curl -fsSL https://tailscale.com/install.sh | sudo sh
+          sudo -i <<EOF
+          curl -fsSL https://tailscale.com/install.sh | sh
+          curl -fsSL https://code-server.dev/install.sh | sh
           sudo apt clean
 
       - name: 连接Tailscale内网
@@ -60,26 +59,14 @@ jobs:
             exit 1
           fi
           echo "TAILSCALE_IP=$TAILSCALE_IP" >> $GITHUB_ENV
-          echo "SSH_USER=root" >> $GITHUB_ENV
-          echo "SSH_PASSWORD=@Awf123456789" >> $GITHUB_ENV
 
-      - name: 检测SSH端口连通性
-        run: |
-          echo "正在验证 ${{ env.TAILSCALE_IP }}:22 的SSH连通性..."
-          if ! nc -z ${{ env.TAILSCALE_IP }} 22; then
-            echo "Error: SSH Port 22 is not reachable on ${{ env.TAILSCALE_IP }}."
-            exit 1
-          fi
-
-      - name: 展示SSH连接信息并持续保活
+      - name: 展示信息
         run: |
           echo "======================================"
           echo "SSH远程连接信息"
           echo "======================================"
           echo "Tailscale内网IP: ${{ env.TAILSCALE_IP }}"
-          echo "用户名: ${{ env.SSH_USER }}"
-          echo "密码: ${{ env.SSH_PASSWORD }}"
-          echo "连接命令: ssh ${{ env.SSH_USER }}@${{ env.TAILSCALE_IP }}"
+          echo "VS Code网页版IP: ${{ env.TAILSCALE_IP }}:8080"
           echo "======================================"
           while true; do
             echo "Ubuntu服务器运行中"
