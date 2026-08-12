@@ -24,7 +24,7 @@ jobs:
       - name: 关闭防火墙
         run: |
           sudo -i <<EOF
-          sudo ufw disable
+          ufw disable
           EOF
 
       - name: 安装Tailscale和VS Code网页版
@@ -32,7 +32,6 @@ jobs:
           sudo -i <<EOF
           curl -fsSL https://tailscale.com/install.sh | sh
           curl -fsSL https://code-server.dev/install.sh | sh
-          sudo apt clean
 
       - name: 连接Tailscale内网
         env:
@@ -60,6 +59,8 @@ jobs:
           echo "Tailscale内网IP: ${{ env.TAILSCALE_IP }}"
           echo "VS Code网页版IP: ${{ env.TAILSCALE_IP }}:8080"
           echo "======================================"
+      - name: 持续保活
+        run: |
           while true; do
             echo "Ubuntu服务器运行中"
             sleep 300
