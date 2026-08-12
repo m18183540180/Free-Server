@@ -56,14 +56,14 @@ jobs:
           sudo -i <<'EOF'
           systemctl stop code-server@* 2>/dev/null
           systemctl disable code-server@* 2>/dev/null
-          su - root -c "code-server --bind-addr 127.0.0.1:8080 &"
+          code-server --bind-addr 127.0.0.1:8080 &
           sleep 3
           pkill -f code-server
           sed -i '
-          s/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/
-          s/auth: password/auth: none/
-          ' /root/.config/code-server/config.yaml
-          systemctl enable --now code-server@root
+           s/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/
+           s/auth: password/auth: none/
+           ' ~/.config/code-server/config.yaml
+          systemctl enable --now code-server@runner
           EOF
 
 
