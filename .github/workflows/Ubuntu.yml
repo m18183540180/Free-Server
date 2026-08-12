@@ -51,6 +51,16 @@ jobs:
           fi
           echo "TAILSCALE_IP=$TAILSCALE_IP" >> $GITHUB_ENV
 
+      - name: 配置VS Code网页版
+        run: |
+          sudo -i <<'EOF'
+          pkill -f code-server || true
+          systemctl stop code-server@* 2>/dev/null
+          systemctl disable code-server@* 2>/dev/null
+          systemctl enable --now code-server@root
+          EOF
+
+
       - name: 展示信息
         run: |
           echo "======================================"
@@ -59,6 +69,7 @@ jobs:
           echo "Tailscale内网IP: ${{ env.TAILSCALE_IP }}"
           echo "VS Code网页版IP: ${{ env.TAILSCALE_IP }}:8080"
           echo "======================================"
+      
       - name: 持续保活
         run: |
           while true; do
