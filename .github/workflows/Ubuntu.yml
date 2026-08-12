@@ -11,13 +11,7 @@ jobs:
       DEBIAN_PRIORITY: critical
       TZ: Asia/Shanghai
       
-    steps:
-      - name: 配置用户
-        run: |
-          sudo -i <<EOF
-          echo "root:@Awf123456789" | chpasswd
-          EOF
-            
+    steps:     
       - name: 更改系统语言(中文)
         run: |
           sudo -i <<EOF
@@ -27,12 +21,10 @@ jobs:
           update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
           EOF
           
-      - name: 配置防火墙
+      - name: 关闭防火墙
         run: |
           sudo -i <<EOF
-          ufw allow from any to any
-          ufw reload
-          ufw status
+          sudo ufw disable
           EOF
 
       - name: 安装Tailscale和VS Code网页版
