@@ -53,20 +53,19 @@ jobs:
 
       - name: 配置VS Code网页版
         run: |
-          sudo -i <<'ROOT'
-          systemctl stop code-server@* 2>/dev/null || true
-          systemctl disable code-server@* 2>/dev/null || true
-          ROOT
-          code-server --bind-addr 127.0.0.1:8080 &
-          sleep 10
-          pkill -f code-server
-          sed -i '
-          s/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/
-          s/auth: password/auth: none/
-          ' ~/.config/code-server/config.yaml
-          sudo -i <<'ROOT'
-          systemctl enable --now code-server@runner
-          ROOT
+          sudo systemctl stop code-server@* 2>/dev/null || true
+          sudo systemctl disable code-server@* 2>/dev/null || true
+          mkdir -p /home/runner/.config/code-server
+          cat > /home/runner/.config/code-server/config.yaml <<'EOT'
+          bind-addr: 0.0.0.0:8080
+          auth: none
+          cert: false
+          password: ""
+          EOT
+          sudo chown -R runner:runner /home/runner/.config/code-server
+          sudo systemctl enable --now code-server@runner
+          sleep 3
+          systemctl status code-server@runner
 
 
       - name: 展示信息
