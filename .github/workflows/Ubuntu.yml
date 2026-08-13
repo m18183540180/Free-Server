@@ -81,9 +81,10 @@ jobs:
 
       - name: 展示信息
         run: |
+          PUBLIC_IP=$(curl -s --max-time 10 ifconfig.me)
+          echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
           echo "======================================"
-          echo "Tailscale 远程连接信息"
-          echo "======================================"
+          echo "虚拟机公网出口IP: ${{ env.PUBLIC_IP }}"
           echo "Tailscale内网IP: ${{ env.TAILSCALE_IP }}"
           echo "VS Code网页地址: http://${{ env.TAILSCALE_IP }}:8080"
           echo "VS Code登录密码: ${{ env.PASSWORD }}"
