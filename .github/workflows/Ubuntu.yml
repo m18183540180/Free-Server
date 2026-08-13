@@ -51,22 +51,19 @@ jobs:
           fi
           echo "TAILSCALE_IP=$TAILSCALE_IP" >> $GITHUB_ENV
 
-      - name: 配置VS Code网页版
+      - name: 临时启动code-server生成原生配置并导出
         run: |
-          sudo systemctl stop code-server@* 2>/dev/null || true
-          sudo systemctl disable code-server@* 2>/dev/null || true
-          mkdir -p /home/runner/.config/code-server
-          cat > /home/runner/.config/code-server/config.yaml <<'EOT'
-          bind-addr: 0.0.0.0:8080
-          auth: none
-          cert: false
-          password: ""
-          EOT
-          sudo chown -R runner:runner /home/runner/.config/code-server
-          sudo systemctl enable --now code-server@runner
-          sleep 3
-          systemctl status code-server@runner
-
+          pkill -f code-server 2>/dev/null || true
+          code-server --bind-addr 127.0.0.1:8080 &
+          PROC_ID=$!
+          echo "code-server进程PID: $PROC_ID"
+          sleep 10
+          kill $PROC_ID
+          wait $PROC_ID 2>/dev/null || true
+          echo "临时进程已终止"
+          echo "==================== 原生 config.yaml 内容 ===================="
+          cat ~/.config/code-server/config.yaml
+          echo "=============================================================="
 
       - name: 展示信息
         run: |
