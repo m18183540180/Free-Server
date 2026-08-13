@@ -7,7 +7,7 @@ jobs:
     timeout-minutes: 3600
     steps:
       - name: 安装Tailscale + TigerVNC
-        run: brew install tailscale tigervnc
+        run: brew install tailscale
 
       - name: 启动 Tailscale 后台守护进程
         run: |
