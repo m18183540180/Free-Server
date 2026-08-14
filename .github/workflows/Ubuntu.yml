@@ -27,29 +27,22 @@ jobs:
           ufw disable
           EOF
 
-      - name: 安装Tailscale和VS Code网页版
+      - name: 安装cloudflared + code-server网页版
         run: |
           sudo -i <<EOF
-          curl -fsSL https://tailscale.com/install.sh | sh
+          mkdir -p --mode=0755 /usr/share/keyrings
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | tee /etc/apt/sources.list.d/cloudflared.list
+          apt update -y
+          apt install -y cloudflared
           curl -fsSL https://code-server.dev/install.sh | sh
+          EOF
 
-      - name: 连接Tailscale内网
+      - name: 连接Cloudflared隧道
         env:
-          KEY: ${{ secrets.KEY }}
+          TUNNEL_KEY: ${{ secrets.TUNNEL_KEY }}
         run: |
-          sudo tailscale up --authkey "$KEY" --hostname "github-${{ github.run_id }}"
-          TAILSCALE_IP=""
-          RETRIES=0
-          while [ -z "$TAILSCALE_IP" ] && [ $RETRIES -lt 10 ]; do
-            TAILSCALE_IP=$(sudo tailscale ip -4)
-            sleep 3
-            RETRIES=$((RETRIES + 1))
-          done
-          if [ -z "$TAILSCALE_IP" ]; then
-            echo "Error: Failed to get Tailscale IPv4 address."
-            exit 1
-          fi
-          echo "TAILSCALE_IP=$TAILSCALE_IP" >> $GITHUB_ENV
+          sudo cloudflared service install "${TUNNEL_KEY}"
 
       - name: 配置VS Code网页版
         run: |
@@ -81,12 +74,7 @@ jobs:
 
       - name: 展示信息
         run: |
-          PUBLIC_IP=$(curl -s --max-time 10 ifconfig.me)
-          echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
           echo "======================================"
-          echo "虚拟机公网IP: ${PUBLIC_IP}"
-          echo "Tailscale内网IP: ${{ env.TAILSCALE_IP }}"
-          echo "VS Code网页地址: http://${{ env.TAILSCALE_IP }}:8080"
           echo "VS Code登录密码: ${{ env.PASSWORD }}"
           echo "======================================"
       
