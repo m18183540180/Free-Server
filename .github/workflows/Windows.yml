@@ -55,7 +55,7 @@ jobs:
         run: |
           & "$env:ProgramFiles\Cloudflare\cloudflared\cloudflared.exe" service install "$env:KEY"
 
-      - name: 显示信息
+      - name: 展示信息
         run: |
           Write-Host "用户名：$env:RDP_USER"
           Write-Host "密码：$env:RDP_PASSWORD"
