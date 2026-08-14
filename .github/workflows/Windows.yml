@@ -51,9 +51,9 @@ jobs:
 
       - name: 连接Cloudflare隧道
         env:
-          KEY: ${{ secrets.KEY }}
+          Windows_KEY: ${{ secrets.Windows_KEY }}
         run: |
-          & "$env:ProgramFiles\Cloudflare\cloudflared\cloudflared.exe" service install "$env:KEY"
+          & "$env:ProgramFiles\Cloudflare\cloudflared\cloudflared.exe" service install "$env:Windows_KEY"
 
       - name: 展示信息
         run: |
