@@ -27,7 +27,7 @@ jobs:
           ufw disable
           EOF
 
-      - name: 安装cloudflared + code-server网页版
+      - name: 安装cloudflared + VS Code网页版
         run: |
           sudo -i <<EOF
           mkdir -p --mode=0755 /usr/share/keyrings
