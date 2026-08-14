@@ -40,7 +40,7 @@ jobs:
 
       - name: 连接Cloudflared隧道
         env:
-          TUNNEL_KEY: ${{ secrets.TUNNEL_KEY }}
+          KEY: ${{ secrets.TUNNEL_KEY }}
         run: |
           sudo cloudflared service install "${TUNNEL_KEY}"
 
@@ -74,9 +74,7 @@ jobs:
 
       - name: 展示信息
         run: |
-          echo "======================================"
           echo "VS Code登录密码: ${{ env.PASSWORD }}"
-          echo "======================================"
       
       - name: 持续保活
         run: |
