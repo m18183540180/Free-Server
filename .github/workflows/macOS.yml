@@ -11,9 +11,9 @@ jobs:
 
       - name: 连接Cloudflare隧道
         env:
-          KEY: ${{ secrets.KEY }}
+          macOS_KEY: ${{ secrets.macOS_KEY }}
         run: |
-          sudo cloudflared service install "${KEY}"
+          sudo cloudflared service install "${macOS_KEY}"
 
       - name: 展示信息
         run: |
