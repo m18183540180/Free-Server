@@ -74,6 +74,9 @@ jobs:
 
       - name: 展示信息
         run: |
+          PUBLIC_IP=$(curl -s --max-time 10 ifconfig.me)
+          echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
+          echo "虚拟机公网IP: ${PUBLIC_IP}"
           echo "VS Code登录密码: ${{ env.PASSWORD }}"
       
       - name: 持续保活
