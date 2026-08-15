@@ -53,7 +53,7 @@ jobs:
         env:
           Windows_KEY: ${{ secrets.Windows_KEY }}
         run: |
-          & "$env:ProgramFiles\Cloudflare\cloudflared\cloudflared.exe" service install "$env:Windows_KEY"
+          & "$env:ProgramFiles\Cloudflare\cloudflared.exe" service install "$env:Windows_KEY"
 
       - name: 展示信息
         run: |
