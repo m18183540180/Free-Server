@@ -6,8 +6,19 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 3600
     steps:
-      - name: 安装Cloudflared
-        run: brew install cloudflared
+      - name: 安装Cloudflared + noVNC
+        run: brew install cloudflared novnc
+
+      - name: 开启macOS屏幕共享(VNC服务 5900端口)
+        run: |
+          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCEnabled -bool YES
+          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCPasswd -string "@Awf123456789"
+          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -allowAccessFor -allUsers -restart -agent
+
+      - name: 启动noVNC网页服务（监听6080）
+        run: |
+          no_vnc --vnc localhost:5900 --listen 6080 &
+          sleep 3
 
       - name: 连接Cloudflare隧道
         env:
@@ -17,6 +28,7 @@ jobs:
 
       - name: 展示信息
         run: |
+           echo "VNC密码：@Awf123456789"
 
       - name: 持续保活
         run: |
