@@ -53,7 +53,10 @@ jobs:
         env:
           WINDOWS_KEY: ${{ secrets.Windows_KEY }}
         run: |
-          & "$env:ProgramFiles\Cloudflare\cloudflared.exe" service install "$env:Windows_KEY"
+          $exePath = "${env:ProgramFiles}\Cloudflare\cloudflared.exe"
+          Start-Process -FilePath $exePath -ArgumentList "tunnel run --token `"$env:Windows_KEY`"" -WindowStyle Hidden
+          Start-Sleep 6
+          Write-Host "隧道进程已后台启动"
 
       - name: 展示信息
         run: |
