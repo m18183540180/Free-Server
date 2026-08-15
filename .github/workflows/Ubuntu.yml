@@ -42,7 +42,7 @@ jobs:
         env:
           UBUNTU_KEY: ${{ secrets.Ubuntu_KEY }}
         run: |
-          sudo cloudflared service install "${Ubuntu_KEY}"
+          sudo cloudflared service install "${{ secrets.Ubuntu_KEY }}"
 
       - name: 配置VS Code网页版
         run: |
