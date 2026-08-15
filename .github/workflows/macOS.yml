@@ -6,8 +6,14 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 3600
     steps:
-      - name: 安装Cloudflared + noVNC
-        run: brew install cloudflared novnc
+      - name: 安装Cloudflared
+        run: brew install cloudflared
+
+      - name: 下载noVNC源码
+        run: |
+          git clone https://github.com/novnc/noVNC.git ~/noVNC
+          cd ~/noVNC
+          git clone https://github.com/novnc/websockify.git utils/websockify
 
       - name: 开启macOS屏幕共享(VNC服务 5900端口)
         run: |
@@ -15,9 +21,10 @@ jobs:
           sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCPasswd -string "@Awf123456789"
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -allowAccessFor -allUsers -restart -agent
 
-      - name: 启动noVNC网页服务（监听6080）
+      - name: 后台启动 noVNC
         run: |
-          no_vnc --vnc localhost:5900 --listen 6080 &
+          cd ~/noVNC
+          ./utils/novnc_proxy --vnc localhost:5900 --listen 6080 &
           sleep 3
 
       - name: 连接Cloudflare隧道
