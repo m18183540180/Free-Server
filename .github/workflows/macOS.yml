@@ -31,7 +31,7 @@ jobs:
         env:
           MACOS_KEY: ${{ secrets.macOS_KEY }}
         run: |
-          sudo cloudflared service install "${macOS_KEY}"
+          sudo cloudflared service install "${{ secrets.macOS_KEY }}"
 
       - name: 展示信息
         run: |
