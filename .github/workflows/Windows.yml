@@ -47,14 +47,14 @@ jobs:
 
       - name: 连接Cloudflare隧道
         env:
-          WINDOWS_KEY: ${{ secrets.WINDOWS_KEY }}
+          WINDOWS_KEY: ${{ secrets.Windows_KEY }}
         run: |
           $exePath = "$env:TEMP\cloudflared.exe"
           if (-not (Test-Path $exePath)) {
             Write-Error "cloudflared.exe 文件缺失！"
             exit 1
           }
-          Start-Process -FilePath $exePath -ArgumentList "tunnel run --token `"$env:WINDOWS_KEY`"" -WindowStyle Hidden
+          Start-Process -FilePath $exePath -ArgumentList "tunnel run --token `"$env:Windows_KEY`"" -WindowStyle Hidden
           Start-Sleep 6
           Write-Host "隧道进程已后台启动"
 
