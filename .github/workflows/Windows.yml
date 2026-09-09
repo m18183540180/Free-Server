@@ -50,11 +50,11 @@ jobs:
           & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="$Env:KEY" --hostname="github-rdp-server"
           Start-Sleep -Seconds 8
           $ts_ip = & "C:\Program Files\Tailscale\tailscale.exe" ip -4
-          echo "TS_IP=$ts_ip" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "TS_IP=$ts_ip" >> $env:GITHUB_ENV
 
       - name: 展示信息
         run: |
-          Write-Host "Tailscale IP:$TS_IP" -ForegroundColor Yellow
+          Write-Host "Tailscale IP:$env:TS_IP" -ForegroundColor Yellow
           Write-Host "用户名: $env:RDP_USER" -ForegroundColor Yellow
           Write-Host "密码: $env:RDP_PASSWORD" -ForegroundColor Yellow
           
