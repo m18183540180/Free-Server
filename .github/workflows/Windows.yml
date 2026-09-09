@@ -40,28 +40,22 @@ jobs:
           echo "RDP_USER=$RDP_USER" >> $env:GITHUB_ENV
           echo "RDP_PASSWORD=$RDP_PASS" >> $env:GITHUB_ENV
 
-      - name: 下载cloudflared程序
-        run: |
-          $exePath = "$env:TEMP\cloudflared.exe"
-          Invoke-WebRequest -Uri "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe" -OutFile $exePath
-
-      - name: 连接Cloudflare隧道
+      - name: 安装并连接Tailscale VPN
         env:
-          WINDOWS_KEY: ${{ secrets.Windows_KEY }}
+          KEY: ${{ secrets.KEY }}
         run: |
-          $exePath = "$env:TEMP\cloudflared.exe"
-          if (-not (Test-Path $exePath)) {
-            Write-Error "cloudflared.exe 文件缺失！"
-            exit 1
-          }
-          Start-Process -FilePath $exePath -ArgumentList "tunnel run --token `"$env:Windows_KEY`"" -WindowStyle Hidden
-          Start-Sleep 6
-          Write-Host "隧道进程已后台启动"
+          Invoke-WebRequest "https://pkgs.tailscale.com/stable/tailscale-setup-latest-amd64.msi" -OutFile "C:\tailscale.msi"
+          Start-Process msiexec -ArgumentList "/i C:\tailscale.msi /quiet /norestart" -Wait
+          Start-Sleep -Seconds 5
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey="$Env:TAILSCALE_AUTHKEY" --hostname="github-rdp-server"
+          Start-Sleep -Seconds 8
+          $ts_ip = & "C:\Program Files\Tailscale\tailscale.exe" ip -4
 
       - name: 展示信息
         run: |
-          Write-Host "用户名：$env:RDP_USER"
-          Write-Host "密码：$env:RDP_PASSWORD"
+          Write-Host "  Tailscale IP:$ts_ip" -ForegroundColor Yellow
+          Write-Host "  用户名: $env:RDP_USER" -ForegroundColor Yellow
+          Write-Host "  密码: $env:RDP_PASSWORD" -ForegroundColor Yellow
           
       - name: 持续保活
         run: |
