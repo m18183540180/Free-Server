@@ -50,17 +50,17 @@ jobs:
           sudo systemctl stop code-server@* 2>/dev/null || true
           sudo systemctl disable code-server@* 2>/dev/null || true
           pkill -f code-server 2>/dev/null || true
-         sudo systemctl stop code-server@root 2>/dev/null || true
-         sudo systemctl disable code-server@root 2>/dev/null || true
-         sudo systemctl start code-server@root
-         sleep 5
-         sudo systemctl status code-server@root
-         sudo sed -i 's/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/' /root/.config/code-server/config.yaml
-         sudo sed -i 's/auth: password/auth: none/' /root/.config/code-server/config.yaml
-         sudo systemctl restart code-server@root
-         sudo systemctl enable code-server@root
-         sleep 3
-         systemctl status code-server@root
+          sudo systemctl stop code-server@root 2>/dev/null || true
+          sudo systemctl disable code-server@root 2>/dev/null || true
+          sudo systemctl start code-server@root
+          sleep 5
+          sudo systemctl status code-server@root
+          sudo sed -i 's/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/' /root/.config/code-server/config.yaml
+          sudo sed -i 's/auth: password/auth: none/' /root/.config/code-server/config.yaml
+          sudo systemctl restart code-server@root
+          sudo systemctl enable code-server@root
+          sleep 3
+          systemctl status code-server@root
 
       - name: 展示信息
         run: |
