@@ -49,28 +49,18 @@ jobs:
           pkill -f code-server 2>/dev/null || true
           sudo systemctl stop code-server@* 2>/dev/null || true
           sudo systemctl disable code-server@* 2>/dev/null || true
-          code-server --bind-addr 127.0.0.1:8080 &
-          PROC_ID=$!
-          sleep 10
-          kill $PROC_ID
-          wait $PROC_ID 2>/dev/null || true
-          sed -i 's/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/' ~/.config/code-server/config.yaml
-          PASSWORD=$(grep 'password:' ~/.config/code-server/config.yaml | awk '{print $2}')
-          RETRIES=0
-          while [ -z "$PASSWORD" ] && [ $RETRIES -lt 5 ]; do
-            sleep 2
-            PASSWORD=$(grep 'password:' ~/.config/code-server/config.yaml | awk '{print $2}')
-            RETRIES=$((RETRIES + 1))
-          done
-          if [ -z "$PASSWORD" ]; then
-            echo "Error: 读取code-server登录密码失败!"
-            exit 1
-          fi
-          echo "PASSWORD=$PASSWORD" >> $GITHUB_ENV
-          sudo chown -R runner:runner /home/runner/.config/code-server
-          sudo systemctl enable --now code-server@runner
-          sleep 3
-          systemctl status code-server@runner
+          pkill -f code-server 2>/dev/null || true
+         sudo systemctl stop code-server@root 2>/dev/null || true
+         sudo systemctl disable code-server@root 2>/dev/null || true
+         sudo systemctl start code-server@root
+         sleep 5
+         sudo systemctl status code-server@root
+         sudo sed -i 's/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:8080/' /root/.config/code-server/config.yaml
+         sudo sed -i 's/auth: password/auth: none/' /root/.config/code-server/config.yaml
+         sudo systemctl restart code-server@root
+         sudo systemctl enable code-server@root
+         sleep 3
+         systemctl status code-server@root
 
       - name: 展示信息
         run: |
