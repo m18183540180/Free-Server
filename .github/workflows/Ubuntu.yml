@@ -12,7 +12,7 @@ jobs:
       TZ: Asia/Shanghai
       
     steps:
-      - name: 更改系统语言(中文)
+      - name: 更新系统
         run: |
           sudo -i <<EOF
           apt upgrade
