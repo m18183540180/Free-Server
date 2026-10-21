@@ -11,7 +11,13 @@ jobs:
       DEBIAN_PRIORITY: critical
       TZ: Asia/Shanghai
       
-    steps:     
+    steps:
+      - name: 更改系统语言(中文)
+        run: |
+          sudo -i <<EOF
+          apt upgrade
+          apt update -y
+          
       - name: 更改系统语言(中文)
         run: |
           sudo -i <<EOF
