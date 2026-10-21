@@ -15,6 +15,7 @@ jobs:
       - name: 更新系统
         run: |
           sudo -i <<EOF
+          apt update -y
           apt upgrade
           apt update -y
           
