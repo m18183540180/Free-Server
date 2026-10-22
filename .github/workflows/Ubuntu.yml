@@ -16,8 +16,7 @@ jobs:
         run: |
           sudo -i <<EOF
           apt update -y
-          apt upgrade
-          apt update -y
+          apt upgradey
           EOF
       - name: 更改系统语言(中文)
         run: |
