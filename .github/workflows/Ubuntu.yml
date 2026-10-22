@@ -16,12 +16,11 @@ jobs:
         run: |
           sudo -i <<EOF
           apt update -y
-          apt upgradey
+          apt upgrade
           EOF
       - name: 更改系统语言(中文)
         run: |
           sudo -i <<EOF
-          apt update -y
           apt install -y locales language-pack-zh-hans language-pack-zh-hans-base
           locale-gen zh_CN.UTF-8
           update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
