@@ -46,9 +46,9 @@ jobs:
 
       - name: 连接Cloudflared隧道
         env:
-          KEY: ${{ secrets.KEY }}
+          UBUNTU_KEY: ${{ secrets.UBUNTU_KEY }}
         run: |
-          sudo cloudflared service install "${{ secrets.KEY }}"
+          sudo cloudflared service install "${{ secrets.UBUNTU_KEY }}"
 
       - name: 配置VS Code网页版
         run: |
